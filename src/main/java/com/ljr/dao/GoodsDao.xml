@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ljr.dao.GoodsDao">
+    <select id="selectGoods" resultType="com.ljr.domain.Goods">
+     select ItemID,commodity,quantity,price from Goods where ItemID = #{ItemID}
+    </select>
+    <insert id="">
+
+    </insert>
+    <update id="updateGoods">
+        update Goods set quantity = quantity - #{quantity} where ItemID = #{ItemID}
+    </update>
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <bean id="DataSource01" class="com.alibaba.druid.pool.DruidDataSource"
+    init-method="init" destroy-method="close">
+        <property name="url" value="jdbc:mysql://localhost:3306/javadb"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456"/>
+        <property name="maxActive" value="20"/>
+    </bean>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="DataSource01"/>
+        <property name="configLocation" value="classpath:mybatis.xml"/>
+    </bean>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="SqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.ljr.dao"/>
+    </bean>
+    <bean id = "buyGoodsservice"  class="com.ljr.service.impl.BuyGoodsserviceImpl">
+        <property name="saleDao" ref="saleDao"/>
+        <property name="goodsDao" ref="goodsDao"/>
+    </bean>
+
+    <bean name="Sale" class="com.ljr.domain.Sale"/>
+    <!--  事务处理  -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="DataSource01"/>
+    </bean>
+
+<!--    <tx:annotation-driven transaction-manager="transactionManager"/>-->
+
+    <tx:advice id="aopadvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="buy" propagation="REQUIRED" isolation="DEFAULT"
+            rollback-for="java.lang.NullPointerException,com.ljr.Excdption.NotEnoughException"/>
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <aop:pointcut id="service" expression="execution(* *..service..*.*(..))"/>
+        <aop:advisor advice-ref="aopadvice" pointcut-ref="service"/>
+    </aop:config>
+
+
+
+
+</beans>
